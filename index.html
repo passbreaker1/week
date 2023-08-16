@@ -1,12 +1,96 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
 </head>
+
 <body>
-  <h1>hello</h1>
-  <h1>hello</h1>
+    <p>숫자 야구게임</p>
+    <div>컴퓨터가 숫자를 생성하였습니다. 답을 맞춰보세요! <br></div>
+    <input id="user-input" type="number" placeholder="0~9사이 숫자 입력">
+    <button id="go-button">Go!</button>
 </body>
+<script>
+    // - 컴퓨터는 0과 9 사이의 서로 다른 숫자 3개를 무작위로 뽑습니다. (ex) 123, 759 완료
+    // - 사용자는 컴퓨터가 뽑은 숫자를 맞추기 위해 시도합니다. 완료
+    // - 컴퓨터는 사용자가 입력한 세자리 숫자에 대해서, 아래의 규칙대로 스트라이크(S)와 볼(B)를 알려줍니다.
+    //     - 숫자의 값과 위치가 모두 일치하면 S 배열 
+    //     - 숫자의 값은 일치하지만 위치가 틀렸으면 B
+    // - 기회는 무제한이며, 몇번의 시도 후에 맞췄는지 기록됩니다. 완료
+    // - 숫자 3개를 모두 맞춘 경우, 게임을 종료합니다. 완료
+
+    let inputNumber = document.getElementById("input-number"); //id 요소에 접근
+    let goButton = document.getElementById("go-button");
+    let userInput = document.getElementById("user-input")
+
+    goButton.addEventListener("click", play);  //event 주는 것
+
+    // 중복 값 없이 3개의 랜덤 넘버 뽑기
+    let number = [];
+        for (let n = 1; n < 10; n++) {
+            number.push(n)
+        }
+        let answer =[]; //key,value 없이 모아놓기만 하면 되므로 객체 사용
+        for (let n = 0; n < 3; n++) { //(0~3번째) 3번 반복
+            let random = Math.floor(Math.random() * number.length) 
+            //n = 0이므로 숫자는 0부터 시작 9곱하면 0~8까지 정수
+            // 9,8,7,6 ....으로 가야됨 9-n으로 해도 되지만 number.length로 
+            answer.push(number[random]) 
+            number.splice(random,1) 
+            //뽑은거에 push해줬으므로 원래 있던 거에 splice로 빼주기
+            console.log(answer) 
+        }
+        
+    //검증 
+    let tries = [];
+        function check(input) {
+            if (input.length !== 3 ){
+                return alert('3자리를 입력해주세요.');
+            }
+            if (new Set(input).size !== 3){
+                return alert('중복된 숫자가 있습니다.');
+                // new Set은 중복되지 않는 값만이 있음, length가 아니라 size로 길이 잼
+            }
+            if (tries.includes(input)){
+                return alert('이미 시도한 값입니다.');
+            }
+            return true;
+        }
+
+    // 숫자 비교
+    let result = 0;
+    
+    function play() {
+        let userValue = userInput.value;
+        result++;
+        let strike = 0;
+        let ball = 0;
+        
+        //answer: 314, value: 123
+        for (let i = 0; i < answer.length; i++) {
+            const index = userValue.indexOf(answer[i]); //indexOf 메서드: 배열에서 지정된 요소를 찾을 수 있는 첫번째 인덱스를 반환하고 없으면 -1 반환
+            if (index > -1){ //일치하는 숫자 발견
+                if (index === i) {//자릿수도 같다
+                strike += 1;
+                } else { //숫자만 같다
+                ball += 1;
+                }        
+            }
+        }
+         if (check(userValue)){
+                document.querySelector('div').innerHTML = document.querySelector('div').innerHTML + result + '번째 시도 ' + userValue + ' strike : ' + strike + ' ball : ' + ball + '<br>' 
+                tries.push(userValue);
+            }
+            if (answer.join('') === userValue){
+                document.querySelector('div').innerHTML = '홈런입니다' + " " + result + '번만에 성공했습니다.'
+                alert('게임 종료')
+                return
+            }   
+     }
+     
+</script>
+
 </html>
